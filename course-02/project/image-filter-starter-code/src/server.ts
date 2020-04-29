@@ -43,34 +43,41 @@ import fs = require('fs')
   app.get("/filteredimage", async function(req , res){
      let url = req.query.image_url;
      if(!url)
-       res.status(400).send("Image URL not found!");
+       return res.status(400).send("Image URL not found!");
 
      var exp = "^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$"
      var regex = new RegExp(exp);
      if(!url.match(regex))
      {
-        res.status(400).send("URL is not valid!");
+        return res.status(400).send("URL is not valid!");
+     }     
+
+     var imgData;     
+     try
+     {
+       imgData = await Jimp.read(url)
+     }
+     catch(e)
+     {
+        return res.status(404).send("Image not found!")
      }     
 
      var resp = await filterImageFromURL(url);
      var path = __dirname + "/util/tmp/";
      console.log(path);
      fs.readdir(path , async function(err , readres)
-       {
-         
-         console.log(readres);
+       {        
 
          readres = readres.map(function (item) {           
             return path + item;
          });
 
          if(err) 
-         {
-           console.log("Error");
-           res.status(404).send(err)
+         {        
+           return res.status(404).send(err)
          }         
 
-         res.status(200).sendFile(resp);
+         return res.status(200).sendFile(resp);
 
          res.on('finish' , function() {           
            deleteLocalFiles(readres);
