@@ -1,0 +1,3 @@
+Below is the URL for the image filter service hosted on AWS through beanstalk.
+
+EBS Url : http://image-filter-starter-code-dev22222222222222.us-east-1.elasticbeanstalk.com/
